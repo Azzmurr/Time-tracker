@@ -91,11 +91,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _angular_platform_browser_animations__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/platform-browser/animations */ "./node_modules/@angular/platform-browser/fesm5/animations.js");
 /* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./app.component */ "./src/app/app.component.ts");
-/* harmony import */ var _angular_material_card__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @angular/material/card */ "./node_modules/@angular/material/esm5/card.es5.js");
-/* harmony import */ var _components_stopwatch_stopwatch_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/stopwatch/stopwatch.component */ "./src/app/components/stopwatch/stopwatch.component.ts");
-/* harmony import */ var _angular_material_button__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/material/button */ "./node_modules/@angular/material/esm5/button.es5.js");
-/* harmony import */ var _components_stopwatch_stopwatch_actions_stopwatch_actions_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./components/stopwatch/stopwatch-actions/stopwatch-actions.component */ "./src/app/components/stopwatch/stopwatch-actions/stopwatch-actions.component.ts");
-/* harmony import */ var _components_stopwatch_stopwatch_laps_stopwatch_laps_component__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/stopwatch/stopwatch-laps/stopwatch-laps.component */ "./src/app/components/stopwatch/stopwatch-laps/stopwatch-laps.component.ts");
+/* harmony import */ var _components_stopwatch_stopwatch_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/stopwatch/stopwatch.component */ "./src/app/components/stopwatch/stopwatch.component.ts");
+/* harmony import */ var _components_stopwatch_stopwatch_actions_stopwatch_actions_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/stopwatch/stopwatch-actions/stopwatch-actions.component */ "./src/app/components/stopwatch/stopwatch-actions/stopwatch-actions.component.ts");
+/* harmony import */ var _components_stopwatch_stopwatch_laps_stopwatch_laps_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/stopwatch/stopwatch-laps/stopwatch-laps.component */ "./src/app/components/stopwatch/stopwatch-laps/stopwatch-laps.component.ts");
+/* harmony import */ var _angular_forms__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @angular/forms */ "./node_modules/@angular/forms/fesm5/forms.js");
+/* harmony import */ var _material_material_module__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./material/material.module */ "./src/app/material/material.module.ts");
+/* harmony import */ var _services_stopwatch_service__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./services/stopwatch.service */ "./src/app/services/stopwatch.service.ts");
+
 
 
 
@@ -113,18 +115,18 @@ var AppModule = /** @class */ (function () {
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_2__["NgModule"])({
             declarations: [
                 _app_component__WEBPACK_IMPORTED_MODULE_4__["AppComponent"],
-                _components_stopwatch_stopwatch_component__WEBPACK_IMPORTED_MODULE_6__["StopwatchComponent"],
-                _components_stopwatch_stopwatch_actions_stopwatch_actions_component__WEBPACK_IMPORTED_MODULE_8__["StopwatchActionsComponent"],
-                _components_stopwatch_stopwatch_laps_stopwatch_laps_component__WEBPACK_IMPORTED_MODULE_9__["StopwatchLapsComponent"],
-                _components_stopwatch_stopwatch_actions_stopwatch_actions_component__WEBPACK_IMPORTED_MODULE_8__["StopwatchActionsComponent"]
+                _components_stopwatch_stopwatch_component__WEBPACK_IMPORTED_MODULE_5__["StopwatchComponent"],
+                _components_stopwatch_stopwatch_actions_stopwatch_actions_component__WEBPACK_IMPORTED_MODULE_6__["StopwatchActionsComponent"],
+                _components_stopwatch_stopwatch_laps_stopwatch_laps_component__WEBPACK_IMPORTED_MODULE_7__["StopwatchLapsComponent"],
+                _components_stopwatch_stopwatch_actions_stopwatch_actions_component__WEBPACK_IMPORTED_MODULE_6__["StopwatchActionsComponent"]
             ],
             imports: [
                 _angular_platform_browser__WEBPACK_IMPORTED_MODULE_1__["BrowserModule"],
                 _angular_platform_browser_animations__WEBPACK_IMPORTED_MODULE_3__["BrowserAnimationsModule"],
-                _angular_material_card__WEBPACK_IMPORTED_MODULE_5__["MatCardModule"],
-                _angular_material_button__WEBPACK_IMPORTED_MODULE_7__["MatButtonModule"]
+                _angular_forms__WEBPACK_IMPORTED_MODULE_8__["FormsModule"],
+                _material_material_module__WEBPACK_IMPORTED_MODULE_9__["MaterialModule"]
             ],
-            providers: [],
+            providers: [_services_stopwatch_service__WEBPACK_IMPORTED_MODULE_10__["StopwatchService"]],
             bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_4__["AppComponent"]]
         })
     ], AppModule);
@@ -173,6 +175,21 @@ var Lap = /** @class */ (function () {
         this._finalTime = this.unixTime();
         return this;
     };
+    Lap.prototype.toJSON = function () {
+        return {
+            id: this.id,
+            start: this._start,
+            end: this._end,
+            finalTime: this._finalTime
+        };
+    };
+    Lap.prototype.restore = function (configuration) {
+        this.id = configuration.id;
+        this._start = configuration.start;
+        this._end = configuration.end;
+        this._finalTime = configuration.finalTime;
+        return this;
+    };
     return Lap;
 }());
 
@@ -196,7 +213,6 @@ var StopwatchLap = /** @class */ (function () {
     function StopwatchLap() {
         this.id = +new Date();
         this.laps = [];
-        this.formated = "00:00:00";
     }
     StopwatchLap.prototype.start = function () {
         if (this.activeLap && !this.activeLap.isEnded()) {
@@ -226,6 +242,21 @@ var StopwatchLap = /** @class */ (function () {
         var seconds_str = (seconds < 10 ? "0" : "") + seconds + "";
         return hours_str + ':' + minutes_str + ':' + seconds_str;
     };
+    StopwatchLap.prototype.toJSON = function () {
+        return {
+            id: this.id,
+            laps: this.laps,
+            activeLapId: this.activeLap && this.activeLap.id,
+            comment: this.comment
+        };
+    };
+    StopwatchLap.prototype.restore = function (configuration) {
+        this.id = configuration.id;
+        this.laps = configuration.laps.map(function (lap) { return new _lap_lap__WEBPACK_IMPORTED_MODULE_0__["Lap"]().restore(lap); });
+        this.activeLap = this.laps.find(function (lap) { return lap.id === configuration.activeLapId; });
+        this.comment = configuration.comment;
+        return this;
+    };
     return StopwatchLap;
 }());
 
@@ -252,16 +283,19 @@ var Stopwatch = /** @class */ (function () {
         var _this = this;
         this.id = +new Date();
         this.laps = [];
+        this.lapsMap = {};
+        this.inProgress = false;
+        this.time = "";
         this.timeObserverFunc = function (observer) {
             var interval = setInterval(function () {
                 var stopwatchTime = _this.formatedTime();
-                if (_this.oldFormatedTime !== stopwatchTime.str) {
-                    _this.oldFormatedTime = stopwatchTime.str;
+                if (_this.time !== stopwatchTime.str) {
+                    _this.time = stopwatchTime.str;
                     observer.next(stopwatchTime);
                 }
             }, 200);
         };
-        this.timeObservable = new rxjs__WEBPACK_IMPORTED_MODULE_1__["Observable"](this.timeObserverFunc);
+        this.time$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["Observable"](this.timeObserverFunc);
     }
     Stopwatch.prototype.start = function () {
         if (this.activeLap) {
@@ -269,25 +303,36 @@ var Stopwatch = /** @class */ (function () {
         }
         else {
             var lap = new _stopwatch_lap_stopwatch_lap__WEBPACK_IMPORTED_MODULE_0__["StopwatchLap"]().start();
+            this.lapsMap[lap.id] = lap;
             this.activeLap = lap;
-            this.laps.push(lap);
+            this.laps.unshift(lap);
         }
-        return this.activeLap;
+        this.inProgress = true;
+        return this;
     };
     Stopwatch.prototype.stop = function () {
         if (this.activeLap) {
             this.activeLap.stop();
         }
+        this.inProgress = false;
+        return this;
     };
     Stopwatch.prototype.newLap = function () {
         this.stop();
         this.activeLap = null;
-        console.log(this.laps);
+        return this.start();
+    };
+    Stopwatch.prototype.continiueLap = function (id) {
+        this.stop();
+        if (this.lapsMap[id])
+            this.activeLap = this.lapsMap[id];
         return this.start();
     };
     Stopwatch.prototype.reset = function () {
+        this.stop();
         this.laps.length = 0;
         this.activeLap = null;
+        return this;
     };
     Stopwatch.prototype.unixTime = function () {
         return this.laps.reduce(function (actual, lap) { return actual + lap.unixTime(); }, 0);
@@ -307,8 +352,20 @@ var Stopwatch = /** @class */ (function () {
             str: hours_str + ':' + minutes_str + ':' + seconds_str
         };
     };
-    Stopwatch.prototype.time = function () {
-        return this.timeObservable;
+    Stopwatch.prototype.toJSON = function () {
+        return {
+            id: this.id,
+            laps: this.laps,
+            activeLapId: this.activeLap && this.activeLap.id
+        };
+    };
+    Stopwatch.prototype.restore = function (configuration) {
+        var parcedConfiguration = JSON.parse(configuration);
+        this.id = parcedConfiguration.id;
+        this.laps = parcedConfiguration.laps.map(function (lap) { return new _stopwatch_lap_stopwatch_lap__WEBPACK_IMPORTED_MODULE_0__["StopwatchLap"]().restore(lap); });
+        this.lapsMap = this.laps.reduce(function (laps, lap) { return (laps[lap.id] = lap) && laps; }, {});
+        this.activeLap = this.lapsMap[parcedConfiguration.activeLapId];
+        this.inProgress = !!this.activeLap;
     };
     return Stopwatch;
 }());
@@ -324,7 +381,7 @@ var Stopwatch = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<mat-card class=\"stopwatch-actions\">\r\n  <mat-card-content class=\"stopwatch-actions-wrapper\">\r\n    <button *ngIf=\"inProggres\" class=\"stopwatch-actions-button\" mat-button (click)=\"stop()\" color=\"accent\">Stop</button>\r\n    <button *ngIf=\"!inProggres\" class=\"stopwatch-actions-button\" mat-button (click)=\"start()\" color=\"primary\">Start</button>\r\n    <button *ngIf=\"inProggres\" class=\"stopwatch-actions-button\" mat-button (click)=\"stopwatch.newLap()\" color=\"primary\">Lap</button>\r\n    <button *ngIf=\"stopwatch.laps.length\" class=\"stopwatch-actions-button\" mat-button (click)=\"reset()\" color=\"warn\">Reset</button>\r\n  </mat-card-content>\r\n</mat-card>"
+module.exports = "<mat-card class=\"stopwatch-actions\">\r\n  <mat-card-content class=\"stopwatch-actions-wrapper\">\r\n    <button *ngIf=\"stopwatch.inProgress\" class=\"stopwatch-actions-button\" mat-button (click)=\"stop()\" color=\"accent\">Stop</button>\r\n    <button *ngIf=\"!stopwatch.inProgress\" class=\"stopwatch-actions-button\" mat-button (click)=\"start()\" color=\"primary\">Start</button>\r\n    <button *ngIf=\"stopwatch.inProgress\" class=\"stopwatch-actions-button\" mat-button (click)=\"stopwatch.newLap()\" color=\"primary\">Lap</button>\r\n    <button *ngIf=\"stopwatch.laps.length\" class=\"stopwatch-actions-button\" mat-button (click)=\"reset()\" color=\"warn\">Reset</button>\r\n  </mat-card-content>\r\n</mat-card>"
 
 /***/ }),
 
@@ -351,39 +408,34 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StopwatchActionsComponent", function() { return StopwatchActionsComponent; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var src_app_classes_stopwatch_stopwatch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! src/app/classes/stopwatch/stopwatch */ "./src/app/classes/stopwatch/stopwatch.ts");
+/* harmony import */ var src_app_services_stopwatch_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! src/app/services/stopwatch.service */ "./src/app/services/stopwatch.service.ts");
 
 
 
 var StopwatchActionsComponent = /** @class */ (function () {
-    function StopwatchActionsComponent() {
+    function StopwatchActionsComponent(stopwatchService) {
+        this.stopwatchService = stopwatchService;
         this.inProggres = false;
+        this.stopwatch = stopwatchService.stopwatch;
     }
     StopwatchActionsComponent.prototype.ngOnInit = function () {
     };
     StopwatchActionsComponent.prototype.start = function () {
         this.stopwatch.start();
-        this.inProggres = true;
     };
     StopwatchActionsComponent.prototype.stop = function () {
         this.stopwatch.stop();
-        this.inProggres = false;
     };
     StopwatchActionsComponent.prototype.reset = function () {
         this.stopwatch.reset();
-        this.inProggres = false;
     };
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", src_app_classes_stopwatch_stopwatch__WEBPACK_IMPORTED_MODULE_2__["Stopwatch"])
-    ], StopwatchActionsComponent.prototype, "stopwatch", void 0);
     StopwatchActionsComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
             selector: 'tt-stopwatch-actions',
             template: __webpack_require__(/*! ./stopwatch-actions.component.html */ "./src/app/components/stopwatch/stopwatch-actions/stopwatch-actions.component.html"),
             styles: [__webpack_require__(/*! ./stopwatch-actions.component.scss */ "./src/app/components/stopwatch/stopwatch-actions/stopwatch-actions.component.scss")]
         }),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [src_app_services_stopwatch_service__WEBPACK_IMPORTED_MODULE_2__["StopwatchService"]])
     ], StopwatchActionsComponent);
     return StopwatchActionsComponent;
 }());
@@ -399,7 +451,7 @@ var StopwatchActionsComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<mat-card class=\"stopwatch-lap\" *ngFor=\"let lap of stopwatch.laps\">\r\n  <mat-card-content>\r\n    {{ lap.formatedTime() }}\r\n  </mat-card-content>\r\n</mat-card>\r\n\r\n<span *ngIf=\"!stopwatch.laps.length\" class=\"stopwatch-hint\">Here will be your tracker history</span>\r\n"
+module.exports = "<mat-expansion-panel #stopwatchLap class=\"stopwatch-lap\" *ngFor=\"let lap of stopwatch.laps\" mat-elevation-z1>\r\n  <mat-expansion-panel-header>\r\n    <mat-panel-title class=\"stopwatch-lap-time\" [ngClass]=\"{'stopwatch-lap-time__active': stopwatch.activeLap.id === lap.id}\">\r\n      {{ lap.formatedTime() }}\r\n    </mat-panel-title>\r\n    <mat-panel-description class=\"stopwatch-lap-comment\">\r\n      {{ lap.comment }}\r\n    </mat-panel-description>\r\n  </mat-expansion-panel-header>\r\n\r\n  <mat-form-field class=\"stopwatch-lap-comment-input\">\r\n    <input matInput placeholder=\"Your comment\" [(ngModel)]=\"lap.comment\">\r\n  </mat-form-field>\r\n\r\n  <mat-action-row class=\"stopwatch-lap-actions\">\r\n    <button mat-button color=\"primary\" *ngIf=\"stopwatch.activeLap.id === lap.id\" (click)=\"startNewLap(stopwatchLap)\">Start new track</button>\r\n    <button mat-button color=\"primary\" *ngIf=\"stopwatch.activeLap.id !== lap.id\" (click)=\"startThisLap(stopwatchLap, lap)\">Continiue this track</button>\r\n  </mat-action-row>\r\n</mat-expansion-panel>\r\n\r\n<span *ngIf=\"!stopwatch.laps.length\" class=\"stopwatch-hint\">Here will be your tracker history</span>\r\n"
 
 /***/ }),
 
@@ -410,7 +462,7 @@ module.exports = "<mat-card class=\"stopwatch-lap\" *ngFor=\"let lap of stopwatc
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ".stopwatch-lap {\n  margin: 10px 0; }\n\n.stopwatch-hint {\n  text-align: center;\n  display: block;\n  margin: 15px 0;\n  color: #808080; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvY29tcG9uZW50cy9zdG9wd2F0Y2gvc3RvcHdhdGNoLWxhcHMvRjpcXHByb2plY3RzXFx0aW1lLXRyYWNrZXJfZGV2L3NyY1xcYXBwXFxjb21wb25lbnRzXFxzdG9wd2F0Y2hcXHN0b3B3YXRjaC1sYXBzXFxzdG9wd2F0Y2gtbGFwcy5jb21wb25lbnQuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGNBQWMsRUFBQTs7QUFHaEI7RUFDRSxrQkFBa0I7RUFDbEIsY0FBYztFQUNkLGNBQWM7RUFDZCxjQUFjLEVBQUEiLCJmaWxlIjoic3JjL2FwcC9jb21wb25lbnRzL3N0b3B3YXRjaC9zdG9wd2F0Y2gtbGFwcy9zdG9wd2F0Y2gtbGFwcy5jb21wb25lbnQuc2NzcyIsInNvdXJjZXNDb250ZW50IjpbIi5zdG9wd2F0Y2gtbGFwIHtcclxuICBtYXJnaW46IDEwcHggMDtcclxufVxyXG5cclxuLnN0b3B3YXRjaC1oaW50IHtcclxuICB0ZXh0LWFsaWduOiBjZW50ZXI7XHJcbiAgZGlzcGxheTogYmxvY2s7XHJcbiAgbWFyZ2luOiAxNXB4IDA7XHJcbiAgY29sb3I6ICM4MDgwODA7XHJcbn0iXX0= */"
+module.exports = ".stopwatch-lap {\n  margin: 10px 0;\n  padding: 0; }\n  .stopwatch-lap-time {\n    flex: 0; }\n  .stopwatch-lap-time__active {\n      color: #f44336; }\n  .stopwatch-lap-comment {\n    white-space: nowrap;\n    text-overflow: ellipsis;\n    overflow: hidden;\n    display: block; }\n  .stopwatch-lap-content {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-between;\n    align-items: center; }\n  .stopwatch-lap-actions {\n    padding: 0; }\n  .stopwatch-lap-comment-input {\n    width: 100%; }\n  .stopwatch-hint {\n  text-align: center;\n  display: block;\n  margin: 15px 0;\n  color: #808080; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvY29tcG9uZW50cy9zdG9wd2F0Y2gvc3RvcHdhdGNoLWxhcHMvRjpcXHByb2plY3RzXFx0aW1lLXRyYWNrZXJfZGV2L3NyY1xcYXBwXFxjb21wb25lbnRzXFxzdG9wd2F0Y2hcXHN0b3B3YXRjaC1sYXBzXFxzdG9wd2F0Y2gtbGFwcy5jb21wb25lbnQuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGNBQWM7RUFDZCxVQUFVLEVBQUE7RUFFVjtJQUNFLE9BQU8sRUFBQTtFQUNQO01BQ0UsY0FBYyxFQUFBO0VBSWxCO0lBQ0UsbUJBQW1CO0lBQ25CLHVCQUF1QjtJQUN2QixnQkFBZ0I7SUFDaEIsY0FBYyxFQUFBO0VBR2hCO0lBQ0UsYUFBYTtJQUNiLG1CQUFtQjtJQUNuQiw4QkFBOEI7SUFDOUIsbUJBQW1CLEVBQUE7RUFHckI7SUFDRSxVQUFVLEVBQUE7RUFHWjtJQUNFLFdBQVcsRUFBQTtFQUlmO0VBQ0Usa0JBQWtCO0VBQ2xCLGNBQWM7RUFDZCxjQUFjO0VBQ2QsY0FBYyxFQUFBIiwiZmlsZSI6InNyYy9hcHAvY29tcG9uZW50cy9zdG9wd2F0Y2gvc3RvcHdhdGNoLWxhcHMvc3RvcHdhdGNoLWxhcHMuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyIuc3RvcHdhdGNoLWxhcCB7XHJcbiAgbWFyZ2luOiAxMHB4IDA7XHJcbiAgcGFkZGluZzogMDtcclxuXHJcbiAgJi10aW1lIHtcclxuICAgIGZsZXg6IDA7XHJcbiAgICAmX19hY3RpdmUge1xyXG4gICAgICBjb2xvcjogI2Y0NDMzNjtcclxuICAgIH1cclxuICB9XHJcblxyXG4gICYtY29tbWVudCB7XHJcbiAgICB3aGl0ZS1zcGFjZTogbm93cmFwO1xyXG4gICAgdGV4dC1vdmVyZmxvdzogZWxsaXBzaXM7XHJcbiAgICBvdmVyZmxvdzogaGlkZGVuO1xyXG4gICAgZGlzcGxheTogYmxvY2s7XHJcbiAgfVxyXG5cclxuICAmLWNvbnRlbnQge1xyXG4gICAgZGlzcGxheTogZmxleDtcclxuICAgIGZsZXgtZGlyZWN0aW9uOiByb3c7XHJcbiAgICBqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWJldHdlZW47XHJcbiAgICBhbGlnbi1pdGVtczogY2VudGVyO1xyXG4gIH1cclxuXHJcbiAgJi1hY3Rpb25zIHtcclxuICAgIHBhZGRpbmc6IDA7XHJcbiAgfVxyXG5cclxuICAmLWNvbW1lbnQtaW5wdXQge1xyXG4gICAgd2lkdGg6IDEwMCU7XHJcbiAgfVxyXG59XHJcblxyXG4uc3RvcHdhdGNoLWhpbnQge1xyXG4gIHRleHQtYWxpZ246IGNlbnRlcjtcclxuICBkaXNwbGF5OiBibG9jaztcclxuICBtYXJnaW46IDE1cHggMDtcclxuICBjb2xvcjogIzgwODA4MDtcclxufSJdfQ== */"
 
 /***/ }),
 
@@ -426,26 +478,34 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StopwatchLapsComponent", function() { return StopwatchLapsComponent; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var src_app_classes_stopwatch_stopwatch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! src/app/classes/stopwatch/stopwatch */ "./src/app/classes/stopwatch/stopwatch.ts");
+/* harmony import */ var src_app_services_stopwatch_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! src/app/services/stopwatch.service */ "./src/app/services/stopwatch.service.ts");
 
 
 
 var StopwatchLapsComponent = /** @class */ (function () {
-    function StopwatchLapsComponent() {
+    function StopwatchLapsComponent(stopwatchService) {
+        this.stopwatchService = stopwatchService;
+        this.stopwatch = stopwatchService.stopwatch;
     }
     StopwatchLapsComponent.prototype.ngOnInit = function () {
     };
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", src_app_classes_stopwatch_stopwatch__WEBPACK_IMPORTED_MODULE_2__["Stopwatch"])
-    ], StopwatchLapsComponent.prototype, "stopwatch", void 0);
+    StopwatchLapsComponent.prototype.startNewLap = function (matExpansionPanel) {
+        matExpansionPanel.close();
+        this.stopwatch.newLap();
+    };
+    StopwatchLapsComponent.prototype.startThisLap = function (matExpansionPanel, stopwatchLap) {
+        matExpansionPanel.close();
+        this.stopwatch
+            .stop()
+            .continiueLap(stopwatchLap.id);
+    };
     StopwatchLapsComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
             selector: 'tt-stopwatch-laps',
             template: __webpack_require__(/*! ./stopwatch-laps.component.html */ "./src/app/components/stopwatch/stopwatch-laps/stopwatch-laps.component.html"),
             styles: [__webpack_require__(/*! ./stopwatch-laps.component.scss */ "./src/app/components/stopwatch/stopwatch-laps/stopwatch-laps.component.scss")]
         }),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [src_app_services_stopwatch_service__WEBPACK_IMPORTED_MODULE_2__["StopwatchService"]])
     ], StopwatchLapsComponent);
     return StopwatchLapsComponent;
 }());
@@ -461,7 +521,7 @@ var StopwatchLapsComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "\r\n<div class=\"stopwatch\">\r\n    <mat-card class=\"stopwatch-card\">\r\n        <mat-card-content> \r\n          <span class=\"stopwatch-time\"> {{ hours }} </span>\r\n          <span class=\"stopwatch-time\"> {{ minutes }} </span>\r\n          <span class=\"stopwatch-time stopwatch-time__half\"> {{ seconds }} </span>\r\n         </mat-card-content>\r\n      </mat-card>\r\n      \r\n      <tt-stopwatch-actions [stopwatch]=\"stopwatch\"></tt-stopwatch-actions>\r\n      <tt-stopwatch-laps [stopwatch]=\"stopwatch\"></tt-stopwatch-laps>\r\n</div>"
+module.exports = "\r\n<div class=\"stopwatch\">\r\n    <mat-card class=\"stopwatch-card\">\r\n        <mat-card-content> \r\n          <span class=\"stopwatch-time\"> {{ hours }} </span>\r\n          <span class=\"stopwatch-time\"> {{ minutes }} </span>\r\n          <span class=\"stopwatch-time stopwatch-time__half\"> {{ seconds }} </span>\r\n         </mat-card-content>\r\n      </mat-card>\r\n      \r\n      <tt-stopwatch-actions></tt-stopwatch-actions>\r\n      <tt-stopwatch-laps></tt-stopwatch-laps>\r\n</div>"
 
 /***/ }),
 
@@ -488,20 +548,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StopwatchComponent", function() { return StopwatchComponent; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var src_app_classes_stopwatch_stopwatch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! src/app/classes/stopwatch/stopwatch */ "./src/app/classes/stopwatch/stopwatch.ts");
+/* harmony import */ var src_app_services_stopwatch_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! src/app/services/stopwatch.service */ "./src/app/services/stopwatch.service.ts");
 
 
 
 var StopwatchComponent = /** @class */ (function () {
-    function StopwatchComponent() {
-        this.stopwatch = new src_app_classes_stopwatch_stopwatch__WEBPACK_IMPORTED_MODULE_2__["Stopwatch"]();
+    function StopwatchComponent(stopwatchService) {
+        this.stopwatchService = stopwatchService;
         this.hours = "00";
         this.minutes = "00";
         this.seconds = "00";
+        this.stopwatch = stopwatchService.stopwatch;
     }
     StopwatchComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.stopwatch.time().subscribe({
+        this.stopwatch.time$.subscribe({
             next: function (time) {
                 _this.hours = time.h;
                 _this.minutes = time.m;
@@ -515,9 +576,136 @@ var StopwatchComponent = /** @class */ (function () {
             template: __webpack_require__(/*! ./stopwatch.component.html */ "./src/app/components/stopwatch/stopwatch.component.html"),
             styles: [__webpack_require__(/*! ./stopwatch.component.scss */ "./src/app/components/stopwatch/stopwatch.component.scss")]
         }),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [src_app_services_stopwatch_service__WEBPACK_IMPORTED_MODULE_2__["StopwatchService"]])
     ], StopwatchComponent);
     return StopwatchComponent;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/material/material.module.ts":
+/*!*********************************************!*\
+  !*** ./src/app/material/material.module.ts ***!
+  \*********************************************/
+/*! exports provided: MaterialModule */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MaterialModule", function() { return MaterialModule; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _angular_material_card__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/material/card */ "./node_modules/@angular/material/esm5/card.es5.js");
+/* harmony import */ var _angular_material_button__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/material/button */ "./node_modules/@angular/material/esm5/button.es5.js");
+/* harmony import */ var _angular_material_expansion__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/material/expansion */ "./node_modules/@angular/material/esm5/expansion.es5.js");
+/* harmony import */ var _angular_material_input__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @angular/material/input */ "./node_modules/@angular/material/esm5/input.es5.js");
+
+
+
+
+
+
+var MaterialModule = /** @class */ (function () {
+    function MaterialModule() {
+    }
+    MaterialModule = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["NgModule"])({
+            declarations: [],
+            imports: [
+                _angular_material_card__WEBPACK_IMPORTED_MODULE_2__["MatCardModule"],
+                _angular_material_button__WEBPACK_IMPORTED_MODULE_3__["MatButtonModule"],
+                _angular_material_expansion__WEBPACK_IMPORTED_MODULE_4__["MatExpansionModule"],
+                _angular_material_input__WEBPACK_IMPORTED_MODULE_5__["MatInputModule"]
+            ],
+            exports: [
+                _angular_material_card__WEBPACK_IMPORTED_MODULE_2__["MatCardModule"],
+                _angular_material_button__WEBPACK_IMPORTED_MODULE_3__["MatButtonModule"],
+                _angular_material_expansion__WEBPACK_IMPORTED_MODULE_4__["MatExpansionModule"],
+                _angular_material_input__WEBPACK_IMPORTED_MODULE_5__["MatInputModule"],
+            ]
+        })
+    ], MaterialModule);
+    return MaterialModule;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/services/local-storage.service.ts":
+/*!***************************************************!*\
+  !*** ./src/app/services/local-storage.service.ts ***!
+  \***************************************************/
+/*! exports provided: LocalStorageService */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LocalStorageService", function() { return LocalStorageService; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+
+
+var LocalStorageService = /** @class */ (function () {
+    function LocalStorageService() {
+    }
+    LocalStorageService.prototype.save = function (stopwatch) {
+        localStorage.setItem("stopwatch", JSON.stringify(stopwatch));
+    };
+    LocalStorageService.prototype.get = function () {
+        return localStorage.getItem("stopwatch");
+    };
+    LocalStorageService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
+            providedIn: 'root'
+        }),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
+    ], LocalStorageService);
+    return LocalStorageService;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/services/stopwatch.service.ts":
+/*!***********************************************!*\
+  !*** ./src/app/services/stopwatch.service.ts ***!
+  \***********************************************/
+/*! exports provided: StopwatchService */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StopwatchService", function() { return StopwatchService; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _classes_stopwatch_stopwatch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../classes/stopwatch/stopwatch */ "./src/app/classes/stopwatch/stopwatch.ts");
+/* harmony import */ var _local_storage_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./local-storage.service */ "./src/app/services/local-storage.service.ts");
+
+
+
+
+var StopwatchService = /** @class */ (function () {
+    function StopwatchService(localStorageService) {
+        var _this = this;
+        this.localStorageService = localStorageService;
+        this.stopwatch = new _classes_stopwatch_stopwatch__WEBPACK_IMPORTED_MODULE_2__["Stopwatch"]();
+        window.onbeforeunload = function (e) {
+            _this.localStorageService.save(_this.stopwatch);
+        };
+        var stopwatchConfiguration = this.localStorageService.get();
+        this.stopwatch.restore(stopwatchConfiguration);
+    }
+    StopwatchService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
+            providedIn: 'root'
+        }),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_local_storage_service__WEBPACK_IMPORTED_MODULE_3__["LocalStorageService"]])
+    ], StopwatchService);
+    return StopwatchService;
 }());
 
 
